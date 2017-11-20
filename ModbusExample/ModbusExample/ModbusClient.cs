@@ -14,31 +14,64 @@ namespace ModbusExample
         private int serverPort;
         public CustomModbusClient(string ipAddress, int port)
         {
-            serverIpAddress = ipAddress;
-            serverPort = port;
+            ServerIpAddress = ipAddress;
+            ServerPort = port;
             modbusClient = new ModbusClient(ipAddress, port);
         }
 
+
         public void WriteInRegisters<T>(int startingAddress, T value)
         {
-            int[] values = ConvertToRegister(value);
+            int[] values = ConvertingValueHandler.ConvertToRegister(value);
             modbusClient.Connect();
             modbusClient.WriteMultipleRegisters(startingAddress, values);
             modbusClient.Disconnect();
         }
 
-        private int[] ConvertToRegister<T>(T value)
+        public float ReadFloatFromRegisters(int startingAddress)
         {
-            int[] retValues = { };
-            if (typeof(T) == typeof(float))
-            {
-                retValues = ModbusClient.ConvertFloatToRegisters(Convert.ToSingle(value));
-            }
+            modbusClient.Connect();
+            int[] byteArray = modbusClient.ReadHoldingRegisters(startingAddress, 2);
+            modbusClient.Disconnect();
 
-            return retValues;
+            return ModbusClient.ConvertRegistersToFloat(byteArray);
         }
 
-        public string ServerIpAddress { get => serverIpAddress; set => serverIpAddress = value; }
-        public int Port { get => serverPort; set => serverPort = value; }
+        public short ReadShortFromRegisters(int startingAddress)
+        {
+            modbusClient.Connect();
+            int[] byteArray = modbusClient.ReadHoldingRegisters(startingAddress, 1);
+            modbusClient.Disconnect();
+
+            return Convert.ToInt16(byteArray[0]);
+        }
+
+        public string ServerIpAddress
+        {
+            get
+            {
+                return serverIpAddress;
+            }
+
+            set
+            {
+                serverIpAddress = value;
+            }
+        }
+
+        public int ServerPort
+        {
+            get
+            {
+                return serverPort;
+            }
+
+            set
+            {
+                serverPort = value;
+            }
+        }
+
+
     }
 }

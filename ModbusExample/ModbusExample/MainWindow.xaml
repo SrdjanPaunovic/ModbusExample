@@ -5,8 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ModbusExample"
         mc:Ignorable="d"
+        xmlns:chartingToolkit="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
         Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
-    </Grid>
+  <Grid>
+    <chartingToolkit:Chart Name="lineChart" Title="Line Graph" Background="DimGray" 
+                             Foreground="DarkBlue" IsEnabled="True">
+      <chartingToolkit:LineSeries Title="Value"  
+                                    ItemsSource="{Binding ObsCollection}" 
+                                    DependentValueBinding="{Binding Path=Value}" 
+                                    IndependentValueBinding="{Binding Path=Key}"
+                                    IsSelectionEnabled="False"
+                                    >
+        <chartingToolkit:LineSeries.IndependentAxis>
+          <chartingToolkit:LinearAxis Orientation="X" Title="Time (s)"  />
+        </chartingToolkit:LineSeries.IndependentAxis>
+        <chartingToolkit:LineSeries.DependentRangeAxis>
+          <chartingToolkit:LinearAxis Orientation="Y" Title="Value"/>
+        </chartingToolkit:LineSeries.DependentRangeAxis>
+      </chartingToolkit:LineSeries>
+    </chartingToolkit:Chart>
+  </Grid>
 </Window>
