@@ -20,89 +20,95 @@ using System.Windows.Shapes;
 
 namespace ModbusExample
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window, INotifyPropertyChanged
-    {
-        private FixedSizedQueue<KeyValuePair<long, short>> fixedQueue = new FixedSizedQueue<KeyValuePair<long, short>>(500);
-        private ObservableCollection<KeyValuePair<long, short>> obsCollection = new ObservableCollection<KeyValuePair<long, short>>();
-        private object lockObject = new object();
-        private CustomModbusClient modbusClient;
-        private long timer = 0;
+	/// <summary>
+	/// Interaction logic for MainWindow.xaml
+	/// </summary>
+	public partial class MainWindow : Window, INotifyPropertyChanged
+	{
+		//private ObservableCollection<KeyValuePair<long, short>> obsCollection = new ObservableCollection<KeyValuePair<long, short>>();
+		//public ObservableCollection<KeyValuePair<long, short>> ObsCollection
+		//{
+		//	get
+		//	{
+		//		return obsCollection;
+		//	}
 
-        public FixedSizedQueue<KeyValuePair<long, short>> FixedQueue
-        {
-            get
-            {
-                return fixedQueue;
-            }
+		//	set
+		//	{
+		//		obsCollection = value;
+		//	}
+		//}
 
-            set
-            {
-                fixedQueue = value;
-            }
-        }
+		private ObservableCollection<KeyValuePair<long, float>> obsCollection = new ObservableCollection<KeyValuePair<long, float>>();
+		private CustomModbusClient modbusClient;
+		private long timer = 0;
 
-        public ObservableCollection<KeyValuePair<long, short>> ObsCollection
-        {
-            get
-            {
-                return obsCollection;
-            }
+		public ObservableCollection<KeyValuePair<long, float>> ObsCollection
+		{
+			get
+			{
+				return obsCollection;
+			}
 
-            set
-            {
-                obsCollection = value;
-            }
-        }
+			set
+			{
+				obsCollection = value;
+			}
+		}
 
-        public MainWindow()
-        {
-            InitializeComponent();
-            DataContext = this;
-            modbusClient = new CustomModbusClient("localhost", 502);
-            //   modbusClient.WriteInRegisters(5, s);
-            Task t = new Task(Loop);
-            t.Start();
+		public MainWindow()
+		{
+			InitializeComponent();
+			DataContext = this;
+			modbusClient = new CustomModbusClient("localhost", 502);
+			//   modbusClient.WriteInRegisters(5, s);
+			Task t = new Task(Loop);
+			t.Start();
 
-        }
+		}
 
-        public void Loop()
-        {
-            while (true)
-            {
-                CollectData();
-                timer++;
-                Thread.Sleep(1000); // sleep 1s
-            }
-        }
+		public void Loop()
+		{
+			while (true)
+			{
+				CollectData();
+				timer++;
+				Thread.Sleep(1000); // sleep 1s
+			}
+		}
 
-        public void CollectData()
-        {
-            short sValue = modbusClient.ReadShortFromRegisters(5);
-            this.Dispatcher.Invoke(() =>
-            {
-                ObsCollection.Add(new KeyValuePair<long, short>(timer, sValue));
-            });
+		public void CollectData()
+		{
+			//short value = modbusClient.ReadShortFromRegisters(5);
 
-            // fixedQueue.Enqueue(new KeyValuePair<long, short>(timer,sValue));
-            // OnPropertyChanged(nameof(FixedQueue));
-        }
+			float value = modbusClient.ReadFloatFromRegisters(3);
 
-        #region INotifyPropertyChanged
+			this.Dispatcher.Invoke(() =>
+			{
+				ObsCollection.Add(new KeyValuePair<long, float>(timer, value));
+				while(ObsCollection.Count > 15)
+				{
+					ObsCollection.RemoveAt(0);
+				}
+			});
 
-        public event PropertyChangedEventHandler PropertyChanged;
+			// fixedQueue.Enqueue(new KeyValuePair<long, short>(timer,sValue));
+			// OnPropertyChanged(nameof(FixedQueue));
+		}
 
-        public void OnPropertyChanged([CallerMemberName]string propertyName = null)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
+		#region INotifyPropertyChanged
 
-        #endregion
+		public event PropertyChangedEventHandler PropertyChanged;
 
-    }
+		public void OnPropertyChanged([CallerMemberName]string propertyName = null)
+		{
+			if (PropertyChanged != null)
+			{
+				PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+
+		#endregion
+
+	}
 }

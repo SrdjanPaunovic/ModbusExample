@@ -1,20 +1,11 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ModbusExample
 {
-    public class FixedSizedQueue<T> : INotifyCollectionChanged, IEnumerable<T>
+	public class FixedSizedQueue<T> : IEnumerable<T>
     {
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
-
         ConcurrentQueue<T> queue = new ConcurrentQueue<T>();
         private object lockObject = new object();
 

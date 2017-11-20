@@ -16,6 +16,11 @@
                                     IndependentValueBinding="{Binding Path=Key}"
                                     IsSelectionEnabled="False"
                                     >
+        <chartingToolkit:LineSeries.DataPointStyle>
+          <Style TargetType="chartingToolkit:LineDataPoint">
+            <Setter Property="Background" Value="Purple"/>
+          </Style>
+        </chartingToolkit:LineSeries.DataPointStyle>
         <chartingToolkit:LineSeries.IndependentAxis>
           <chartingToolkit:LinearAxis Orientation="X" Title="Time (s)"  />
         </chartingToolkit:LineSeries.IndependentAxis>
